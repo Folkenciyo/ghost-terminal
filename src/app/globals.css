@@ -1,0 +1,169 @@
+@import "tailwindcss";
+
+:root,
+[data-theme="phosphor"] {
+  --surface: #05070b;
+  --glow: 94 234 212;
+  --tone-default: #cbd5e1;
+  --tone-dim: #55677d;
+  --tone-accent: #5eead4;
+  --tone-ok: #4ade80;
+  --tone-warn: #fbbf24;
+  --tone-err: #f87171;
+  --tone-info: #818cf8;
+  --tone-magenta: #e879f9;
+  --tone-cyan: #22d3ee;
+}
+
+/* IBM 3278 amber: monochrome, warm, almost no colour contrast. */
+[data-theme="amber"] {
+  --surface: #0d0803;
+  --glow: 251 191 36;
+  --tone-default: #f5b642;
+  --tone-dim: #8a5f1d;
+  --tone-accent: #ffd166;
+  --tone-ok: #ffb703;
+  --tone-warn: #ff9f1c;
+  --tone-err: #ff6b35;
+  --tone-info: #d99b30;
+  --tone-magenta: #ffc971;
+  --tone-cyan: #e8a33d;
+}
+
+/* Green phosphor: single hue, high glow. */
+[data-theme="matrix"] {
+  --surface: #030a05;
+  --glow: 34 197 94;
+  --tone-default: #86efac;
+  --tone-dim: #2f6b43;
+  --tone-accent: #4ade80;
+  --tone-ok: #22c55e;
+  --tone-warn: #a3e635;
+  --tone-err: #f87171;
+  --tone-info: #34d399;
+  --tone-magenta: #6ee7b7;
+  --tone-cyan: #2dd4bf;
+}
+
+[data-theme="synthwave"] {
+  --surface: #0d0518;
+  --glow: 232 121 249;
+  --tone-default: #e9d5ff;
+  --tone-dim: #6d5a91;
+  --tone-accent: #f472b6;
+  --tone-ok: #22d3ee;
+  --tone-warn: #fbbf24;
+  --tone-err: #fb7185;
+  --tone-info: #a78bfa;
+  --tone-magenta: #e879f9;
+  --tone-cyan: #67e8f9;
+}
+
+[data-theme="ice"] {
+  --surface: #03080f;
+  --glow: 125 211 252;
+  --tone-default: #dbeafe;
+  --tone-dim: #4a6b8a;
+  --tone-accent: #7dd3fc;
+  --tone-ok: #67e8f9;
+  --tone-warn: #fcd34d;
+  --tone-err: #fda4af;
+  --tone-info: #93c5fd;
+  --tone-magenta: #c4b5fd;
+  --tone-cyan: #38bdf8;
+}
+
+@theme inline {
+  --color-surface: var(--surface);
+  --font-mono: ui-monospace, "SFMono-Regular", "SF Mono", Menlo, Consolas,
+    "Liberation Mono", monospace;
+}
+
+html,
+body {
+  height: 100%;
+  background: var(--surface);
+  color: var(--tone-default);
+  font-family: var(--font-mono);
+  overscroll-behavior: none;
+}
+
+/* Tone roles emitted by the scene engine. */
+[data-tone="default"] { color: var(--tone-default); }
+[data-tone="dim"] { color: var(--tone-dim); }
+[data-tone="accent"] { color: var(--tone-accent); }
+[data-tone="ok"] { color: var(--tone-ok); }
+[data-tone="warn"] { color: var(--tone-warn); }
+[data-tone="err"] { color: var(--tone-err); }
+[data-tone="info"] { color: var(--tone-info); }
+[data-tone="magenta"] { color: var(--tone-magenta); }
+[data-tone="cyan"] { color: var(--tone-cyan); }
+
+/* Phosphor glow + scanlines, layered above the content but never clickable. */
+.crt {
+  position: relative;
+  text-shadow: 0 0 6px rgb(var(--glow) / 0.14);
+  background:
+    radial-gradient(120% 90% at 50% 0%, rgb(var(--glow) / 0.06), transparent 60%),
+    var(--surface);
+}
+
+.crt::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 20;
+  background:
+    repeating-linear-gradient(
+      to bottom,
+      rgb(255 255 255 / 0.028) 0px,
+      rgb(255 255 255 / 0.028) 1px,
+      transparent 1px,
+      transparent 3px
+    ),
+    radial-gradient(130% 100% at 50% 50%, transparent 55%, rgb(0 0 0 / 0.55) 100%);
+  animation: crt-flicker 5.5s steps(24, end) infinite;
+}
+
+@keyframes crt-flicker {
+  0%, 96%, 100% { opacity: 1; }
+  97% { opacity: 0.82; }
+  98% { opacity: 1; }
+  99% { opacity: 0.9; }
+}
+
+.term-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: rgb(255 255 255 / 0.14) transparent;
+}
+
+.term-scroll::-webkit-scrollbar { width: 8px; }
+.term-scroll::-webkit-scrollbar-thumb {
+  background: rgb(255 255 255 / 0.14);
+  border-radius: 999px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .crt::after { animation: none; }
+  * { transition-duration: 0.01ms !important; }
+}
+
+.term-cursor {
+  animation: cursor-blink 1.05s steps(2, start) infinite;
+}
+
+@keyframes cursor-blink {
+  0%, 49% { opacity: 1; }
+  50%, 100% { opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .term-cursor { animation: none; }
+}
+
+/* Rows are plain text, so let the browser skip the ones out of view. */
+.term-row {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 1.55em;
+}
